@@ -40,6 +40,32 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+// Configure the bootJar task with x86_64 compatibility settings and launch script
 bootJar {
     launchScript()
+    manifest {
+        attributes 'Implementation-Title': project.name,
+                   'Implementation-Version': project.version
+    }
+}
+
+// Add architecture-specific settings to Java compilation tasks
+tasks.withType(JavaCompile).configureEach {
+    options.fork = true
+    options.forkOptions.jvmArgs += [
+        '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+        '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
+        '--add-opens', 'java.base/java.text=ALL-UNNAMED',
+        '--add-opens', 'java.desktop/java.awt.font=ALL-UNNAMED'
+    ]
+}
+
+// Configure bootRun task with the same compatibility settings
+tasks.named('bootRun') {
+    jvmArgs = [
+        '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+        '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
+        '--add-opens', 'java.base/java.text=ALL-UNNAMED',
+        '--add-opens', 'java.desktop/java.awt.font=ALL-UNNAMED'
+    ]
 }
